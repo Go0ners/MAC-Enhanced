@@ -37,12 +37,11 @@ Added the ability to manually assign a URL to a container directly from the "Man
 - Auto-refresh of the site list after adding
 - Native visual integration with both light and dark themes
 
-## Installation
+## Download
 
-1. Clone the repository
-2. Open Firefox and go to `about:debugging#/runtime/this-firefox`
-3. Click "Load Temporary Add-on"
-4. Select the `src/manifest.json` file
+[Download from Github](https://github.com/Go0ners/MAC-Enhanced/releases/tag/latest)  
+[Download from Mozilla.org](https://addons.mozilla.org/firefox/downloads/file/4698700/05edbff8dc8c4e908af1-0.2.0.xpi)
+
 
 ## License
 
