@@ -1,18 +1,28 @@
+# OS
 .DS_Store
-node_modules
-README.html
+
+# Dependencies
+node_modules/
+
+# Build artifacts
 *.xpi
+README.html
+src/web-ext-artifacts/*
+web-ext-artifacts/
+
+# Coverage
+.nyc_output/
+coverage/
+
+# IDE
+.vscode/
+.idea/
 *.sw*
 .vimrc
+
+# Kiro
+.kiro/
+
+# Env
 .env
 addon.env
-
-src/web-ext-artifacts/*
-web-ext-artifacts
-
-# JetBrains IDE files
-.idea
-
-# IstanbulJS
-.nyc_output
-coverage
