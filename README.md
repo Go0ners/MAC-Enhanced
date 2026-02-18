@@ -1,38 +1,49 @@
 # MAC-Enhanced
 
-Fork de [MAC-Enhanced](https://github.com/mozilla/multi-account-containers) par Mozilla, avec des améliorations ciblées et un nettoyage du code.
+A lightweight fork of Mozilla's [Multi-Account Containers](https://github.com/mozilla/multi-account-containers), with targeted improvements and a cleaner codebase.
 
-MAC-Enhanced vous permet de cloisonner chaque aspect de votre vie en ligne dans des onglets séparés — plus besoin d'ouvrir un autre navigateur juste pour consulter vos mails pro.
+## Why?
+
+The original extension required you to actually visit a website before assigning it to a container. Setting up containers in advance meant opening each site manually — tedious and time-consuming. MAC-Enhanced fixes this with manual URL assignment: just type a hostname, hit Enter, done.
+
+On top of that, the original ships with Mozilla VPN integration, proxy management, and cross-device sync — features many users simply don't need. These add complexity, extra permissions, and unused code. MAC-Enhanced strips all of that out, leaving a clean, focused container management tool.
 
 ## Changelog
 
-### v0.2.0 — Suppression VPN/Proxy et Sync
+### v0.2.0 — Remove VPN/Proxy and Sync
 
-Nettoyage complet de l'extension pour retirer toutes les fonctionnalités liées à Mozilla VPN, aux proxies et à la synchronisation entre appareils.
+Full cleanup of all Mozilla VPN, proxy, and sync-related features.
 
-- Suppression de tous les fichiers dédiés VPN/Proxy (`mozillaVpn.js`, `proxified-containers.js`, `mozillaVpnBackground.js`) et Sync (`sync.js`)
-- Suppression des images VPN/Proxy (logos, icônes de statut, drapeaux de pays) et de l'icône Sync
-- Nettoyage du background : suppression des cas de messages `MozillaVPN_*` et `resetSync`, des listeners proxy, de la sauvegarde sync dans l'AssignManager
-- Retrait des permissions optionnelles `nativeMessaging` et `proxy` du manifest
-- Suppression de la fonction utilitaire `getBogusProxy()`
-- Nettoyage de l'interface popup : suppression des panneaux d'onboarding 6 (Sync), 7 (Sign-in) et 8 (VPN), du logotype VPN, des champs proxy dans l'éditeur de conteneur, et de toutes les fonctions VPN associées
-- Simplification du flux d'onboarding : passage direct du panneau 5 à la liste des conteneurs
-- Nettoyage de la page d'options : suppression des sections permissions VPN/Proxy et Sync
-- Nettoyage du pageActionPopup : suppression des scripts VPN/Proxy et des références aux drapeaux
-- Suppression de toutes les règles CSS liées au VPN/Proxy (variables, classes `.moz-vpn-*`, tooltips, server list, modal warning, permissions overlay)
-- Suppression de 1500+ clés de traduction VPN/Proxy et Sync dans les 46 locales
+- Removed all dedicated VPN/Proxy files (`mozillaVpn.js`, `proxified-containers.js`, `mozillaVpnBackground.js`) and Sync (`sync.js`)
+- Removed VPN/Proxy images (logos, status icons, country flags) and Sync icon
+- Cleaned background scripts: removed `MozillaVPN_*` and `resetSync` message handlers, proxy listeners, sync backup logic
+- Removed `nativeMessaging` and `proxy` optional permissions from manifest
+- Removed `getBogusProxy()` utility function
+- Cleaned popup UI: removed onboarding panels 6 (Sync), 7 (Sign-in) and 8 (VPN), VPN logotype, proxy fields in container editor, and all VPN-related functions
+- Simplified onboarding flow: panel 5 now goes straight to the containers list
+- Cleaned options page: removed VPN/Proxy permissions and Sync sections
+- Cleaned pageActionPopup: removed VPN/Proxy scripts and flag references
+- Removed all VPN/Proxy CSS rules (variables, `.moz-vpn-*` classes, tooltips, server list, modal warning, permissions overlay)
+- Removed 1500+ VPN/Proxy/Sync translation keys across 46 locales
 
-### v0.1.0 — Assignation manuelle d'URL
+### v0.1.0 — Manual URL Assignment
 
-Ajout de la possibilité d'assigner manuellement une URL à un conteneur directement depuis le panneau "Manage Site List", sans avoir besoin de naviguer d'abord vers le site.
+Added the ability to manually assign a URL to a container directly from the "Manage Site List" panel, without navigating to the site first.
 
-- Ajout d'un champ de saisie et d'un bouton "+" au-dessus de la liste des sites assignés
-- Extraction intelligente du hostname : accepte un hostname simple (`github.com`), une URL complète (`https://github.com/settings`) ou un hostname avec chemin (`github.com/settings`)
-- Validation de l'entrée avec message d'erreur inline en cas de saisie invalide
-- Soumission par clic sur le bouton ou par touche Entrée
-- Rafraîchissement automatique de la liste après ajout
-- Intégration visuelle native avec les thèmes clair et sombre de l'extension
+- Added a text input and "+" button above the assigned sites list
+- Smart hostname extraction: accepts a bare hostname (`github.com`), a full URL (`https://github.com/settings`), or a hostname with path (`github.com/settings`)
+- Inline validation with error message on invalid input
+- Submit by clicking the button or pressing Enter
+- Auto-refresh of the site list after adding
+- Native visual integration with both light and dark themes
 
-## Licence
+## Installation
 
-Ce code source est soumis aux termes de la Mozilla Public License, v. 2.0. Si une copie de la MPL n'a pas été distribuée avec ce fichier, vous pouvez en obtenir une à https://mozilla.org/MPL/2.0/.
+1. Clone the repository
+2. Open Firefox and go to `about:debugging#/runtime/this-firefox`
+3. Click "Load Temporary Add-on"
+4. Select the `src/manifest.json` file
+
+## License
+
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, you can obtain one at https://mozilla.org/MPL/2.0/.
