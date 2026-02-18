@@ -39,7 +39,7 @@ Added the ability to manually assign a URL to a container directly from the "Man
 
 ## Download
 
-[Download from Github](https://github.com/Go0ners/MAC-Enhanced/releases/tag/latest)  
+[Download from Github.com](https://github.com/Go0ners/MAC-Enhanced/releases/tag/latest)  
 [Download from Mozilla.org](https://addons.mozilla.org/firefox/downloads/file/4698700/05edbff8dc8c4e908af1-0.2.0.xpi)
 
 
