@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a problem in Multi-Account Containers
+description: Report a problem in MAC-Enhanced
 labels: [bug]
 body:
   - type: checkboxes

@@ -44,8 +44,6 @@
   --iconArrowRight: url("/img/arrow-icon-right.svg");
   --iconCloseX: url("/img/close.svg");
   --iconGear: url("/img/gear-icon.svg");
-  --iconProxyWarning: url("/img/proxy-warning.svg");
-  --logoMozillaVpn: url("/img/moz-vpn-logo.svg");
   --menuItemHeight: 28px;
   --marginInline: 16px;
   --footerHeight: 48px;
@@ -125,8 +123,6 @@
   --iconGear: url("/img/gear-icon-light.svg");
   --iconArrowRight: url("/img/arrow-icon-right-light.svg");
   --iconArrowLeft: url("/img/arrow-icon-left-light.svg");
-  --iconProxyWarning: url("/img/proxy-warning-light.svg");
-  --logoMozillaVpn: url("/img/moz-vpn-logo-light.svg");
   --bgColor: #42404c;
   --text-normal-color: #f9f9fa;
   --primaryCtaDefault: var(--blue40);
@@ -491,38 +487,6 @@ table {
 
 /* Mozilla VPN status icon */
 
-.moz-vpn-status-icon {
-  color: var(--text-color-primary);
-  background-size: 17px;
-  background-position: left center;
-  font-size: 13px;
-  padding-inline-start: 22px;
-  padding-inline-end: 32px;
-}
-
-.moz-vpn-status-icon.connected {
-  background-image: url("/img/moz-vpn-status-icons/moz-vpn-connected.svg");
-}
-
-.moz-vpn-status-icon.disconnected {
-  background-image: url("/img/moz-vpn-status-icons/moz-vpn-disconnected.svg");
-}
-
-.moz-vpn-logotype.vpn-status-container-list {
-  color: var(--text-color-primary);
-  background-size: 16px;
-  background-position: left center;
-  font-size: 12px;
-  padding-inline-start: 19px;
-  padding-inline-end: 22px;
-  align-items: center;
-}
-
-.moz-vpn-connection-status-indicator.container-list-status-icon {
-  block-size: 16px;
-  inline-size: 16px;
-}
-
 /* Toggle Switch */
 
 .switch {
@@ -641,559 +605,6 @@ input:checked:hover:focus + .slider {
   background-color: var(--button-bg-active-color-primary);
 }
 
-/* Mozilla VPN Controller UI in Container Management Panel */
-
-.moz-vpn-controller-content {
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  padding-block: 16px;
-  transition: max-height 0.3s ease-in-out, padding-block-end 0.2s ease-in-out;
-  box-shadow: 0 0 0 1px var(--panel-separator-color);
-}
-
-.moz-vpn-connection-status-indicator {
-  position: absolute;
-  inset-inline-end: 0;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  size: 0;
-  color: rgba(0, 0, 0, 0);
-  block-size: 24px;
-  inline-size: 24px;
-}
-
-.current-country-flag {
-  display: inline-block;
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: contain;
-  block-size: 16px;
-  inline-size: 16px;
-}
-
-.moz-vpn-controller-content.show-server-button {
-  padding-block-end: 56px;
-  transition: 0.2s ease-in-out;
-}
-
-.dismiss-moz-vpn-tout {
-  margin-inline-start: auto;
-  block-size: 24px;
-  inline-size: 24px;
-  background: var(--bgColor);
-  background-image: var(--iconCloseX);
-  border: none;
-  border-radius: 4px;
-}
-
-.flag-img {
-  block-size: 13px;
-  margin-inline-end: 4px;
-  opacity: 0.9;
-}
-
-.page-action-flag {
-  margin-inline-end: var(--marginInline);
-}
-
-.display-none {
-  display: none;
-}
-
-.proxy-disabled {
-  opacity: 0.4;
-}
-
-fieldset.proxies {
-  position: absolute;
-  inset-block-start: 120px;
-  inset-inline-start: 0;
-  inset-inline-end: 0;
-  block-size: 60px;
-  display: flex;
-  background: #5cabff;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
-  flex-direction: row;
-  pointer-events: none;
-}
-
-input.proxies {
-  font-size: 6px;
-  block-size: 20px;
-  max-block-size: 20px;
-  padding-block: 0 !important;
-  padding-inline: 0 !important;
-  display: inline-flex;
-  inline-size: 40% !important;
-  pointer-events: none;
-}
-
-.moz-vpn-cta {
-  block-size: 32px;
-  margin-block-start: 16px;
-  margin-block-end: 4px;
-  margin-inline: var(--marginInline);
-  text-align: center;
-}
-
-.apply-to-container {
-  block-size: 32px;
-  inline-size: 100%;
-  text-align: center;
-  margin-block: 16px;
-}
-
-#moz-vpn-current-server {
-  align-items: center;
-  border: none;
-  border-radius: 4px;
-  display: flex;
-  block-size: 32px;
-  margin-block-start: 8px;
-  background-color: var(--panel-bg-color);
-  background-image: var(--iconArrowRight);
-  background-position: calc(100% - 24px) center;
-  background-repeat: no-repeat;
-  background-size: 9px;
-  outline: none;
-  padding-inline-start: 20px;
-  margin-inline: 8px;
-  margin-block: 8px;
-  visibility: visible;
-  position: absolute;
-  inset-block-end: 0;
-  inline-size: calc(100% - 16px);
-  opacity: 0;
-  transition: opacity 0.2s ease-in-out;
-}
-
-#moz-vpn-current-server:hover {
-  background-color: var(--button-bg-hover-color-secondary);
-}
-
-#moz-vpn-current-server:focus {
-  outline: 2px solid var(--button-bg-focus-color-primary);
-  outline-offset: 2px;
-}
-
-#moz-vpn-current-server:active {
-  background-color: var(--button-bg-active-color-secondary);
-  outline: none;
-}
-
-.moz-vpn-controller-content.show-server-button #moz-vpn-current-server {
-  opacity: 1;
-}
-
-.moz-vpn-controller-content.show-server-button #moz-vpn-current-server[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@keyframes serverButtonAppear {
-  0% {
-    opacity: 0;
-    visibility: hidden;
-    z-index: -1;
-  }
-
-  90% {
-    z-index: -1;
-    visibility: hidden;
-  }
-
-  100% {
-    visibility: visible;
-    z-index: 1;
-    opacity: 1;
-  }
-}
-
-#moz-vpn-current-server.hidden {
-  block-size: 0;
-  opacity: 0;
-  visibility: hidden;
-  z-index: -1;
-}
-
-.current-city-name {
-  padding-inline-start: 12px;
-}
-
-.collapsible-content {
-  max-block-size: 0;
-  opacity: 0;
-  visibility: hidden;
-  display: none;
-  background-color: var(--bgColor);
-  transition: max-height 0.2s ease-in-out, opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-}
-
-.moz-vpn-subtitle {
-  font-size: 12px;
-  flex: 0 1 80%;
-  color: var(--text-normal-color);
-}
-
-.collapsible-content > .flx-row.flx-space-between {
-  inline-size: calc(100% - 40px);
-  margin-inline: auto;
-  padding-block-start: 12px;
-}
-
-[disabled] {
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-#current-proxy {
-  font-size: 12px;
-  color: var(--grey30);
-  line-height: 13px;
-}
-
-.expanded .collapsible-content {
-  display: flex;
-  max-block-size: 500px;
-  opacity: 1;
-  visibility: visible;
-}
-
-.hide-label,
-.show-label {
-  line-height: 100%;
-  position: absolute;
-  inset-inline-end: 0;
-  transition: visibility 0.2s ease-in-out, color 0.2s ease-in-out, opacity 0.2s ease-in-out;
-}
-
-.expanded .hide-label,
-.show-label {
-  visibility: visible;
-  opacity: 1;
-}
-
-/* stylelint-disable */
-.hide-label,
-.expanded .show-label {
-  visibility: hidden;
-  opacity: 0;
-}
-
-/* stylelint-enable */
-
-.expand-collapse {
-  inline-size: 50%;
-  margin-inline-start: auto;
-  pointer-events: all;
-}
-
-.button-wrapper {
-  margin-inline: 20px;
-}
-
-/* Advanced Proxy Settings Button */
-
-#edit-advanced-proxy-input {
-  padding-inline-end: 40px;
-}
-
-#edit-advanced-proxy-input.valid:focus {
-  box-shadow: 0 0 0 3px #3fe1b030;
-  border-color: var(--green80);
-}
-
-.advanced-proxy-settings-btn {
-  background-color: var(--panel-bg-color);
-  background-image: var(--iconGear), var(--iconArrowRight);
-  background-position: 16px center, calc(100% - 24px) center;
-  background-repeat: no-repeat;
-  background-size: 24px 24px, 9px;
-  border: none;
-  border-radius: 4px;
-  color: var(--text-color-primary);
-  block-size: 32px;
-  line-height: 19px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  outline: none;
-  padding-inline-start: 44px;
-  z-index: 2;
-  transition: opacity 0.1s ease-in-out, background-color 0.1s ease-in-out;
-  margin-inline: 8px;
-  margin-block: 8px;
-}
-
-.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.advanced-proxy-settings-btn:hover {
-  background-color: var(--button-bg-hover-color-secondary);
-}
-
-.advanced-proxy-settings-btn:focus {
-  outline: 2px solid var(--button-bg-focus-color-primary);
-  outline-offset: 2px;
-}
-
-.advanced-proxy-settings-btn:active {
-  background-color: var(--button-bg-active-color-secondary);
-  outline: none;
-}
-
-#clear-advanced-proxy-input {
-  position: absolute;
-  inset-inline-end: 8px;
-  inset-block-start: 7px;
-  border: none;
-  block-size: 22px;
-  inline-size: 22px;
-  border-radius: 50%;
-  background-image: var(--iconCloseX);
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 16px;
-  font-size: 1;
-  color: var(--bgColor);
-}
-
-.proxy-title-container-color {
-  block-size: 12px;
-  inline-size: 12px;
-  z-index: 10;
-  border-radius: 50%;
-}
-
-.advanced-proxy-panel-content {
-  padding-block: 16px;
-  padding-inline: 20px;
-  margin-block-start: 56px;
-  display: flex;
-  flex-direction: column;
-}
-
-.advanced-proxy-input-wrapper {
-  margin-block-start: 12px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.proxy-validity {
-  position: absolute;
-  inset-block-start: 42px;
-  inset-inline-start: 16px;
-  visibility: hidden;
-  opacity: 0;
-  background-color: var(--badge-destructive-bg-color);
-  color: var(--badge-destructive-text-color);
-  border-radius: 4px;
-  padding-block: 2px;
-  padding-inline: 4px;
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-}
-
-.proxy-validity::after {
-  content: "";
-  block-size: 8px;
-  inline-size: 8px;
-  background-color: var(--badge-detructive-bg-color);
-  inset-block-start: -4px;
-  position: absolute;
-  transform: rotate(45deg);
-  inset-inline-start: 12px;
-}
-
-.invalid .proxy-validity {
-  opacity: 1;
-  z-index: 10;
-  visibility: visible;
-}
-
-.invalid .proxy-host.primary-input {
-  border-color: var(--red50);
-  box-shadow: 0 0 0 3px #ff848b70;
-}
-
-.invalid button {
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-/* Mozilla VPN Server list */
-
-.moz-vpn-logotype {
-  color: var(--text-color-primary);
-  background-image: var(--logoMozillaVpn);
-  background-repeat: no-repeat;
-  background-size: 24px;
-  background-position: left center;
-  font-family: var(--fontMetropolis);
-  font-size: 15px;
-  line-height: 24px;
-  padding-inline-start: 28px;
-  position: relative;
-  padding-inline-end: 32px;
-}
-
-#moz-vpn-server-list-panel {
-  block-size: var(--panelSize);
-  max-block-size: var(--panelSize);
-  min-block-size: var(--panelSize);
-  overflow-x: hidden;
-  overflow-y: hidden;
-}
-
-.proxy-panel-title {
-  line-height: var(--rowHeight);
-  block-size: var(--rowHeight);
-  border-block-end: 1px solid var(--panel-separator-color);
-  position: fixed;
-  z-index: 1;
-  background-color: var(--bgColor);
-  transition: box-shadow 0.5s ease;
-}
-
-.moz-vpn-server-list {
-  padding-block-start: 4px;
-  font-size: 15px;
-  color: var(--grey50);
-  position: absolute;
-  inset-block-start: var(--rowHeight);
-  inset-inline-start: 0;
-  inset-inline-end: 0;
-  overflow: scroll;
-  overflow-x: hidden;
-  overscroll-behavior: none;
-  block-size: calc(var(--panelSize) - var(--rowHeight));
-  min-block-size: calc(var(--panelSize) - var(--rowHeight));
-}
-
-#moz-vpn-return {
-  z-index: 2;
-}
-
-.server-list-item {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  background-color: var(--panel-bg-color);
-}
-
-.server-country-flag {
-  inline-size: 16px;
-  margin-inline-start: 16px;
-  margin-block: auto;
-  pointer-events: none;
-}
-
-.server-country-name {
-  padding-block: 0;
-  padding-inline-end: 0;
-  padding-inline-start: 20px;
-  font-family: var(--fontMetropolis);
-  pointer-events: none;
-  color: var(--text-color-primary);
-}
-
-.server-city-list-item,
-.server-city-list-visibility-btn {
-  block-size: 40px;
-  border-radius: 4px;
-  margin-block-start: 4px;
-  margin-block-end: 4px;
-  margin-inline-start: 8px;
-  margin-inline-end: 8px;
-  inline-size: calc(100% - 16px);
-}
-
-/* We need to temporarily use !important for this button to make sure the right color applies */
-.server-city-list-visibility-btn {
-  display: flex;
-  background-color: var(--panel-bg-color) !important;
-  border-radius: 4px;
-  border: none;
-  transition: background-color 0.3s ease;
-}
-
-.server-city-list-visibility-btn:hover {
-  background-color: var(--button-bg-hover-color-secondary) !important;
-}
-
-.server-city-list-visibility-btn:focus {
-  outline: 2px solid var(--button-bg-focus-color-primary);
-  outline-offset: 2px;
-}
-
-.server-city-list-visibility-btn:active {
-  background-color: var(--button-bg-active-color-secondary) !important;
-  outline: none;
-}
-
-.toggle {
-  background-image: url("/img/arrow-toggle.svg");
-  background-position: center center;
-  background-repeat: no-repeat;
-  block-size: 24px;
-  margin-inline-start: 8px;
-  pointer-events: none;
-  transform: rotate(-90deg);
-  transition: transform 0.275s ease-in-out;
-  inline-size: 24px;
-}
-
-.expanded .toggle {
-  transform: rotate(0deg);
-}
-
-.server-city-list {
-  block-size: 0;
-  opacity: 0;
-  transition: height 0.3s ease-in-out, opacity 0.3s ease, visibility 0.4s ease;
-  list-style-type: none;
-  visibility: hidden;
-}
-
-.expanded .server-city-list {
-  opacity: 1;
-  visibility: visible;
-}
-
-.server-city-list-item {
-  align-items: center;
-  display: flex;
-  position: relative;
-}
-
-.server-city-list-item:focus {
-  outline: 2px solid var(--button-bg-focus-color-primary);
-  outline-offset: 2px;
-}
-
-.server-city-list-item:hover {
-  background-color: var(--button-bg-hover-color-secondary);
-}
-
-.server-city-list-item:active {
-  background-color: var(--button-bg-active-color-secondary);
-  outline: none;
-}
-
-.server-city-name {
-  font-family: var(--fontMetropolisLight);
-  font-weight: 300;
-  color: var(--text-color-primary);
-  padding-inline-start: 18px;
-}
-
 /* ----- controller buttons ------- */
 
 .controller {
@@ -1220,182 +631,7 @@ input.proxies {
   outline: none;
 }
 
-/* WARNING MODAL ---- */
-
-.modal-warning {
-  position: absolute;
-  inset-block-start: 0;
-  inset-block-end: 0;
-  inset-inline-start: 0;
-  background-color: #42404c89;
-  z-index: 4;
-  display: flex;
-  justify-content: center;
-}
-
-.modal-content {
-  background-color: var(--bgColor);
-  inline-size: 80%;
-  block-size: 80%;
-  margin-inline: auto;
-  margin-block: auto;
-  border-radius: 16px;
-  box-shadow: 1px 2px 10px 10px var(--bgDark);
-  padding-block: 20px;
-  padding-inline: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-/* ----- MozillaVPN Proxy Unavailable-Specific -------- */
-
-[data-moz-proxy-warning="proxy-unavailable"] {
-  position: relative;
-}
-
-.flag-img.proxy-unavailable {
-  opacity: 0.5;
-}
-
-/* ----- MozillaVPN Status Tooltips -------- */
-
-.tooltip {
-  opacity: 0;
-  position: absolute;
-  z-index: 10;
-  inset-block-start: 24px;
-  inset-inline-end: -3px;
-  font-size: 11px;
-  font-family: var(--fontInter) !important;
-  font-weight: 300;
-  color: var(--text-color-primary);
-  background-color: var(--panel-bg-color);
-  padding-inline: 8px;
-  padding-block: 4px;
-  border-radius: 4px;
-  box-shadow: 0 0 12px 3px #0000001c;
-  transform: translateY(-2px);
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-  min-inline-size: 170px;
-  line-height: 1.3;
-  text-align: center;
-  pointer-events: none;
-}
-
-.tooltip::before {
-  content: "";
-  block-size: 7px;
-  inline-size: 7px;
-  border-radius: 1px;
-  transform: rotate(45deg);
-  background: inherit;
-  position: absolute;
-  inset-block-start: -3px;
-  inset-inline-end: 9px;
-}
-
-[data-moz-proxy-warning="proxy-unavailable"]:hover .tooltip,
-[data-moz-proxy-warning="proxy-unavailable"]:active .tooltip {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.2s ease-in-out 0.5s, transform 0.2s ease-in-out  0.5s;
-}
-
-.moz-vpn-logotype.vpn-status-container-list:hover .tooltip {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.2s ease-in-out 1s, transform 0.2s ease-in-out 1s;
-}
-
-.tooltip.proxy-unavailable::after {
-  inset-inline-start: 4px;
-  inset-inline-end: auto;
-}
-
-.tooltip.proxy-unavailable::before {
-  inset-inline-start: 12px;
-}
-
-.tooltip.proxy-unavailable {
-  inset-inline-start: 32px;
-  inset-block-start: 32px;
-  padding-inline-start: 32px;
-  text-align: left;
-  background-image: var(--iconProxyWarning);
-  background-size: 24px 24px;
-  background-repeat: no-repeat;
-  background-position: 4px 4px;
-}
-
-/* ------------ SERVER LIST RADIO BUTTONS ------------ */
-
-.server-radio-btn {
-  block-size: 20px;
-  opacity: 0;
-  position: fixed;
-  inline-size: 20px;
-}
-
-.server-radio-control {
-  border-radius: 50%;
-  border: 2px solid var(--input-border-color);
-  block-size: 20px;
-  margin-inline-start: 46px;
-  pointer-events: none;
-  position: relative;
-  inline-size: 20px;
-}
-
-.server-radio-btn:checked + .server-radio-control {
-  border-color: var(--input-border-focus-color);
-  border: 2px solid var(--input-border-focus-color);
-}
-
-.server-radio-control::after {
-  border: 2px solid var(--input-border-color);
-  border-radius: 50%;
-  inset-block-end: 0;
-  content: "";
-  block-size: 12px;
-  inset-inline-start: 0;
-  margin-inline: auto;
-  margin-block: auto;
-  opacity: 0;
-  position: absolute;
-  inset-inline-end: 0;
-  inset-block-start: 0;
-  inline-size: 12px;
-}
-
-/* Checked radio button rules */
-
-.server-radio-btn:checked + .server-radio-control::after {
-  background-color: var(--input-border-focus-color);
-  border: 2px solid var(--input-border-focus-color);
-  opacity: 1;
-}
-
-/* Active state */
-.server-radio-btn:active + .server-radio-control {
-  border: 2px solid var(--input-border-active-color);
-}
-
-.server-radio-btn:active + .server-radio-control::after {
-  background-color: var(--input-bg-active-color);
-  border: 2px solid var(--input-border-active-color);
-  opacity: 1;
-}
-
-.server-radio-btn:checked:active + .server-radio-control {
-  border: 2px solid var(--input-border-active-color);
-}
-
-.server-radio-btn:checked:active + .server-radio-control::after {
-  background-color: var(--input-bg-active-color);
-  border: 2px solid var(--input-border-active-color);
-}
+/* Toggle Switch */
 
 /* Helpers */
 
@@ -1518,43 +754,6 @@ input[type=text] {
   margin-block: var(--marginInline);
   margin-inline: var(--marginInline);
   min-block-size: 360px;
-}
-
-.panel.onboarding-panel-8.optional-permissions-disabled {
-  min-block-size: 420px;
-  margin-block-end: 0;
-  margin-inline: 0;
-}
-
-.optional-permissions-disabled #moz-vpn-fw-onboarding-done {
-  display: none !important;
-}
-
-.moz-vpn-permissions {
-  padding-block: var(--marginInline);
-  padding-inline: var(--marginInline);
-  border-block-start: 1px solid var(--panel-separator-color);
-  display: none;
-}
-
-.optional-permissions-disabled .moz-vpn-permissions {
-  display: block;
-  inline-size: 100%;
-}
-
-.moz-vpn-onboarding-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding-inline: var(--marginInline);
-  padding-block-end: var(--marginInline);
-}
-
-.moz-vpn-permissions-copy {
-  padding-inline: 20px;
-  font-size: 12px;
-  margin-block-end: 16px;
 }
 
 .panel-content {
@@ -2375,36 +1574,6 @@ tr:hover > td > .reset-button {
 }
 /* stylelint-enable no-descending-specificity */
 
-/* ----- Permissions Overlay ---------- */
-
-#advanced-proxy-settings-panel,
-.advanced-proxy-panel-content {
-  position: absolute;
-  inset-block: 0;
-  inset-inline: 0;
-}
-
-.permissions-overlay {
-  position: absolute;
-  inset-inline: 0 0;
-  inset-block-start: 40px;
-  inset-block-end: 0;
-  justify-content: center;
-  align-content: center;
-  flex-direction: column;
-  background-color: var(--panel-bg-color);
-  padding-block: 2.25rem;
-  padding-inline: 2.25rem;
-  display: none;
-}
-
-#enable-proxy-permissions {
-  text-align: center;
-  font-family: var(--fontMetropolis);
-  font-size: 14px;
-  margin-block-start: 1rem;
-}
-
 /* OVERFLOW MENU */
 
 .overflow body,
@@ -2477,4 +1646,76 @@ tr:hover > td > .reset-button {
 
 #survey-achievement-done-button:active {
   color: var(--button-bg-active-color-primary);
+}
+
+/* Manual Assignment Row */
+
+.manual-assignment-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 8px;
+  padding-inline: 16px;
+  flex-wrap: wrap;
+}
+
+#manual-assignment-input {
+  flex: 1;
+  block-size: 32px;
+  border: solid 1px var(--input-border-color);
+  border-radius: 4px;
+  background-color: var(--input-bg-color);
+  color: var(--text-color-primary);
+  padding-block: 4px;
+  padding-inline: 8px;
+  font-family: var(--fontInter);
+  font-size: 13px;
+}
+
+#manual-assignment-input:focus {
+  border: solid 1px var(--input-border-focus-color);
+  box-shadow: 0 0 0 1px var(--input-border-focus-color);
+  outline: none;
+}
+
+#manual-assignment-add-btn {
+  block-size: 32px;
+  inline-size: 32px;
+  flex: 0 0 32px;
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--text-color-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#manual-assignment-add-btn::before {
+  content: "+";
+  font-size: 18px;
+  line-height: 1;
+}
+
+#manual-assignment-add-btn:hover {
+  background-color: var(--menu-bg-hover-color);
+  color: var(--button-bg-color-primary);
+}
+
+#manual-assignment-add-btn:focus {
+  outline: 2px solid var(--button-bg-focus-color-primary);
+  outline-offset: 2px;
+}
+
+#manual-assignment-add-btn:active {
+  background-color: var(--menu-bg-active-color);
+  outline: none;
+}
+
+.manual-assignment-error {
+  flex-basis: 100%;
+  color: var(--badge-destructive-bg-color);
+  font-size: 11px;
+  line-height: 1.3;
 }

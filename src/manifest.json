@@ -1,14 +1,14 @@
 {
   "manifest_version": 2,
-  "name": "Firefox Multi-Account Containers",
-  "version": "8.3.5",
+  "name": "MAC-Enhanced",
+  "version": "0.2.0",
   "incognito": "not_allowed",
   "description": "__MSG_extensionDescription__",
   "icons": {
     "48": "img/multiaccountcontainer-16.svg",
     "96": "img/multiaccountcontainer-16.svg"
   },
-  "homepage_url": "https://github.com/mozilla/multi-account-containers#readme",
+  "homepage_url": "https://github.com/Go0ners/MAC-Enhanced",
   "permissions": [
     "<all_urls>",
     "activeTab",
@@ -26,13 +26,11 @@
   ],
   "optional_permissions": [
     "bookmarks",
-    "browsingData",
-    "nativeMessaging",
-    "proxy"
+    "browsingData"
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "@testpilot-containers",
+      "id": "@MACE-containers",
       "strict_min_version": "91.1.0",
       "data_collection_permissions": {
         "required": ["none"]
@@ -114,7 +112,7 @@
   "browser_action": {
     "browser_style": true,
     "default_icon": "img/multiaccountcontainer-16.svg",
-    "default_title": "Firefox Multi-Account Containers",
+    "default_title": "MAC-Enhanced",
     "default_popup": "popup.html",
     "default_area": "navbar",
     "theme_icons": [

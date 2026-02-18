@@ -1,11 +1,11 @@
 {
-  "name": "testpilot-containers",
-  "title": "Multi-Account Containers",
-  "description": "Containers helps you keep all the parts of your online life contained in different tabs. Custom labels and color-coded tabs help keep different activities — like online shopping, travel planning, or checking work email — separate.",
-  "version": "8.3.5",
-  "author": "Andrea Marchesini, Luke Crouch, Lesley Norton, Kendall Werts, Maxx Crawford, Jonathan Kingston",
+  "name": "mace-containers",
+  "title": "MAC-Enhanced",
+  "description": "MAC-Enhanced helps you keep all the parts of your online life contained in different tabs. Custom labels and color-coded tabs help keep different activities — like online shopping, travel planning, or checking work email — separate.",
+  "version": "0.2.0",
+  "author": "Gooners and Andrea Marchesini, Luke Crouch, Lesley Norton, Kendall Werts, Maxx Crawford, Jonathan Kingston",
   "bugs": {
-    "url": "https://github.com/mozilla/multi-account-containers/issues"
+    "url": "https://github.com/Go0ners/MAC-Enhanced"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -29,12 +29,12 @@
     "web-ext": "^8.10.0",
     "webextensions-jsdom": "^1.2.1"
   },
-  "homepage": "https://github.com/mozilla/multi-account-containers#readme",
+  "homepage": "https://github.com/Go0ners/MAC-Enhanced",
   "license": "MPL-2.0",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mozilla/multi-account-containers.git"
+    "url": "git+https://github.com/Go0ners/MAC-Enhanced.git"
   },
   "scripts": {
     "build": "web-ext build -s src/",

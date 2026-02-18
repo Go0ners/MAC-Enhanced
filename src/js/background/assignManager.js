@@ -46,11 +46,6 @@ window.assignManager = {
       return this.getByUrlKey(siteStoreKey);
     },
 
-    async getSyncEnabled() {
-      const { syncEnabled } = await browser.storage.local.get("syncEnabled");
-      return !!syncEnabled;
-    },
-
     async getReplaceTabEnabled() {
       const { replaceTabEnabled } = await browser.storage.local.get("replaceTabEnabled");
       return !!replaceTabEnabled;
@@ -70,32 +65,24 @@ window.assignManager = {
       });
     },
 
-    async set(pageUrlorUrlKey, data, exemptedTabIds, backup = true) {
+    async set(pageUrlorUrlKey, data, exemptedTabIds) {
       const siteStoreKey = this.getSiteStoreKey(pageUrlorUrlKey);
       if (exemptedTabIds) {
         exemptedTabIds.forEach((tabId) => {
           this.setExempted(pageUrlorUrlKey, tabId);
         });
       }
-      data.identityMacAddonUUID =
-        await identityState.lookupMACaddonUUID(data.userContextId);
       await this.area.set({
         [siteStoreKey]: data
       });
-      const syncEnabled = await this.getSyncEnabled();
-      if (backup && syncEnabled) {
-        await sync.storageArea.backup({undeleteSiteStoreKey: siteStoreKey});
-      }
       return;
     },
 
-    async remove(pageUrlorUrlKey, shouldSync = true) {
+    async remove(pageUrlorUrlKey) {
       const siteStoreKey = this.getSiteStoreKey(pageUrlorUrlKey);
       // When we remove an assignment we should clear all the exemptions
       this.removeExempted(pageUrlorUrlKey);
       await this.area.remove([siteStoreKey]);
-      const syncEnabled = await this.getSyncEnabled();
-      if (shouldSync && syncEnabled) await sync.storageArea.backup({siteStoreKey});
       return;
     },
 
@@ -146,14 +133,10 @@ window.assignManager = {
             await this.remove(configKey);
             continue;
           }
-          const updatedSiteAssignment = macConfigs[configKey];
-          updatedSiteAssignment.identityMacAddonUUID =
-            await identityState.lookupMACaddonUUID(match.cookieStoreId);
           await this.set(
             configKey,
-            updatedSiteAssignment,
+            macConfigs[configKey],
             false,
-            false
           );
         }
       }
@@ -189,32 +172,6 @@ window.assignManager = {
     const pageUrl = m.pageUrl;
     await this.storageArea.setExempted(pageUrl, m.tabId);
     return true;
-  },
-
-  async handleProxifiedRequest(requestInfo) {
-    // The following blocks potentially dangerous requests for privacy that come without a tabId
-
-    if(requestInfo.tabId === -1) {
-      return {};
-    }
-
-    const tab = await browser.tabs.get(requestInfo.tabId);
-    const result = await proxifiedContainers.retrieve(tab.cookieStoreId);
-    if (!result || !result.proxy) {
-      return {};
-    }
-
-    // proxyDNS only works for SOCKS proxies
-    if (["socks", "socks4"].includes(result.proxy.type)) {
-      result.proxy.proxyDNS = true;
-    }
-
-    if (!result.proxy.mozProxyEnabled) {
-      return result.proxy;
-    }
-
-    // Let's add the isolation key.
-    return [{ ...result.proxy, connectionIsolationKey: "" + MozillaVPN_Background.isolationKey }];
   },
 
   // Before a request is handled by the browser we decide if we should
@@ -349,7 +306,7 @@ window.assignManager = {
             seems most sane to not try and reopen a tab on history.back()
           - When users open a new tab themselves we want to make sure we
             don't end up with three tabs as per:
-            https://github.com/mozilla/testpilot-containers/issues/421
+            https://github.com/mozilla/mace-containers/issues/421
         If we are coming from an internal url that are used for the new
         tab page (NEW_TAB_PAGES), we can safely close as user is unlikely
         losing history
@@ -396,21 +353,12 @@ window.assignManager = {
     return currentContainerState && currentContainerState.isIsolated;
   },
 
-  maybeAddProxyListeners() {
-    if (browser.proxy) {
-      browser.proxy.onRequest.addListener(this.handleProxifiedRequest, {urls: ["<all_urls>"]});
-    }
-  },
-
   init() {
     browser.contextMenus.onClicked.addListener((info, tab) => {
       info.bookmarkId ?
         this._onClickedBookmark(info) :
         this._onClickedHandler(info, tab);
     });
-
-    // Before anything happens we decide if the request should be proxified
-    this.maybeAddProxyListeners();
 
     // Before a request is handled by the browser we decide if we should
     // route through a different container
@@ -589,7 +537,7 @@ window.assignManager = {
 
   async _setOrRemoveAssignment(tabId, pageUrl, userContextId, remove) {
     let actionName;
-    // https://github.com/mozilla/testpilot-containers/issues/626
+    // https://github.com/mozilla/mace-containers/issues/626
     // Context menu has stored context IDs as strings, so we need to coerce
     // the value to a string for accurate checking
     userContextId = String(userContextId);

@@ -17,9 +17,6 @@ const messageHandler = {
       case "setShortcut":
         identityState.storageArea.setKeyboardShortcut(m.shortcut, m.cookieStoreId);
         break;
-      case "resetSync":
-        response = sync.resetSync();
-        break;
       case "deleteContainer":
         response = backgroundLogic.deleteContainer(m.message.userContextId);
         break;
@@ -114,21 +111,6 @@ const messageHandler = {
         });
         break;
 
-      case "MozillaVPN_attemptPort":
-        MozillaVPN_Background.maybeInitPort();
-        break;
-      case "MozillaVPN_queryServers":
-        MozillaVPN_Background.postToApp("servers");
-        break;
-      case "MozillaVPN_queryStatus":
-        response = MozillaVPN_Background.postToApp("status");
-        break;
-      case "MozillaVPN_getConnectionStatus":
-        response = MozillaVPN_Background.getConnectionStatus();
-        break;
-      case "MozillaVPN_getInstallationStatus":
-        response = MozillaVPN_Background.getInstallationStatus();
-        break;
       }
       return response;
     });
@@ -265,7 +247,7 @@ const messageHandler = {
     assignManager.removeContextMenu();
     // browserAction loses background color in new windows ...
     // https://bugzil.la/1314674
-    // https://github.com/mozilla/testpilot-containers/issues/608
+    // https://github.com/mozilla/mace-containers/issues/608
     // ... so re-call displayBrowserActionBadge on window changes
     badge.displayBrowserActionBadge();
     browser.tabs.query({active: true, windowId}).then((tabs) => {

@@ -1,33 +1,38 @@
-# Multi-Account Containers
+# MAC-Enhanced
 
-[![Test](https://github.com/mozilla/multi-account-containers/actions/workflows/test.yaml/badge.svg)](https://github.com/mozilla/multi-account-containers/actions/workflows/test.yaml)
+Fork de [MAC-Enhanced](https://github.com/mozilla/multi-account-containers) par Mozilla, avec des améliorations ciblées et un nettoyage du code.
 
-The Firefox Multi-Account Containers extension lets you carve out a separate box for each of your online lives – no more opening a different browser just to check your work email!
+MAC-Enhanced vous permet de cloisonner chaque aspect de votre vie en ligne dans des onglets séparés — plus besoin d'ouvrir un autre navigateur juste pour consulter vos mails pro.
 
-Learn more about Multi-Account Containers in
-[our end-user documentation][enduser].
+## Changelog
 
-## Contributing
+### v0.2.0 — Suppression VPN/Proxy et Sync
 
-Everyone is welcome to contribute to Multi-Account Containers. To learn how
-to contribute a patch to Multi-Account Container, please
-[read our contributing guide][contributing].
+Nettoyage complet de l'extension pour retirer toutes les fonctionnalités liées à Mozilla VPN, aux proxies et à la synchronisation entre appareils.
 
-You can also chat with us on [our Matrix room][matrix] or ask in [our discussions board][discussions].
+- Suppression de tous les fichiers dédiés VPN/Proxy (`mozillaVpn.js`, `proxified-containers.js`, `mozillaVpnBackground.js`) et Sync (`sync.js`)
+- Suppression des images VPN/Proxy (logos, icônes de statut, drapeaux de pays) et de l'icône Sync
+- Nettoyage du background : suppression des cas de messages `MozillaVPN_*` et `resetSync`, des listeners proxy, de la sauvegarde sync dans l'AssignManager
+- Retrait des permissions optionnelles `nativeMessaging` et `proxy` du manifest
+- Suppression de la fonction utilitaire `getBogusProxy()`
+- Nettoyage de l'interface popup : suppression des panneaux d'onboarding 6 (Sync), 7 (Sign-in) et 8 (VPN), du logotype VPN, des champs proxy dans l'éditeur de conteneur, et de toutes les fonctions VPN associées
+- Simplification du flux d'onboarding : passage direct du panneau 5 à la liste des conteneurs
+- Nettoyage de la page d'options : suppression des sections permissions VPN/Proxy et Sync
+- Nettoyage du pageActionPopup : suppression des scripts VPN/Proxy et des références aux drapeaux
+- Suppression de toutes les règles CSS liées au VPN/Proxy (variables, classes `.moz-vpn-*`, tooltips, server list, modal warning, permissions overlay)
+- Suppression de 1500+ clés de traduction VPN/Proxy et Sync dans les 46 locales
 
-This repository is governed by Mozilla's code of conduct and etiquette
-guidelines. For more details, [please read the Mozilla Community Participation Guidelines][cpg].
+### v0.1.0 — Assignation manuelle d'URL
 
-### License
+Ajout de la possibilité d'assigner manuellement une URL à un conteneur directement depuis le panneau "Manage Site List", sans avoir besoin de naviguer d'abord vers le site.
 
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
+- Ajout d'un champ de saisie et d'un bouton "+" au-dessus de la liste des sites assignés
+- Extraction intelligente du hostname : accepte un hostname simple (`github.com`), une URL complète (`https://github.com/settings`) ou un hostname avec chemin (`github.com/settings`)
+- Validation de l'entrée avec message d'erreur inline en cas de saisie invalide
+- Soumission par clic sur le bouton ou par touche Entrée
+- Rafraîchissement automatique de la liste après ajout
+- Intégration visuelle native avec les thèmes clair et sombre de l'extension
 
-<!-- Please keep the list in alphabetical order -->
-[contributing]: CONTRIBUTING.md
-[cpg]: https://www.mozilla.org/about/governance/policies/participation/
-[enduser]: https://support.mozilla.org/en-US/kb/containers
-[forum]: https://discourse.mozilla.org/c/containers/223
-[discussions]: https://github.com/mozilla/multi-account-containers/discussions
-[matrix]: https://matrix.to/#/#containers:mozilla.org
+## Licence
+
+Ce code source est soumis aux termes de la Mozilla Public License, v. 2.0. Si une copie de la MPL n'a pas été distribuée avec ce fichier, vous pouvez en obtenir une à https://mozilla.org/MPL/2.0/.

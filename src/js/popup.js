@@ -18,9 +18,6 @@ const P_ONBOARDING_2 = "onboarding2";
 const P_ONBOARDING_3 = "onboarding3";
 const P_ONBOARDING_4 = "onboarding4";
 const P_ONBOARDING_5 = "onboarding5";
-const P_ONBOARDING_6 = "onboarding6";
-const P_ONBOARDING_7 = "onboarding7";
-const P_ONBOARDING_8 = "onboarding8";
 
 const P_CONTAINERS_LIST = "containersList";
 const OPEN_NEW_CONTAINER_PICKER = "new-tab";
@@ -34,9 +31,6 @@ const P_CONTAINERS_ACHIEVEMENT = "containersAchievement";
 const P_SURVEY_ACHIEVEMENT = "surveyAchievement";
 const P_CONTAINER_ASSIGNMENTS = "containerAssignments";
 const P_CLEAR_CONTAINER_STORAGE = "clearContainerStorage";
-
-const P_MOZILLA_VPN_SERVER_LIST = "moz-vpn-server-list";
-const P_ADVANCED_PROXY_SETTINGS = "advanced-proxy-settings-panel";
 
 function addRemoveSiteIsolation() {
   const identity = Logic.currentIdentity();
@@ -53,6 +47,40 @@ async function getExtensionInfo() {
   return extensionInfo;
 }
 
+/**
+ * Extracts and validates a hostname from user input.
+ * Accepts bare hostnames, URLs with protocols, or hostnames with paths.
+ *
+ * @param {string} input - User-provided string (hostname or URL)
+ * @returns {{ valid: boolean, hostname: string|null }}
+ */
+function extractHostname(input) {
+  const trimmed = (input || "").trim();
+  if (!trimmed) {
+    return { valid: false, hostname: null };
+  }
+
+  let urlString = trimmed;
+  if (!urlString.includes("://")) {
+    urlString = "https://" + urlString;
+  }
+
+  let hostname;
+  try {
+    const url = new URL(urlString);
+    hostname = url.hostname;
+  } catch (e) {
+    return { valid: false, hostname: null };
+  }
+
+  if (!hostname || !hostname.includes(".") || !/^[a-zA-Z0-9.-]+$/.test(hostname)) {
+    return { valid: false, hostname: null };
+  }
+
+  return { valid: true, hostname };
+}
+
+
 // This object controls all the panels, identities and many other things.
 const Logic = {
   _identities: [],
@@ -63,10 +91,6 @@ const Logic = {
   _onboardingVariation: null,
 
   async init() {
-    browser.runtime.sendMessage({
-      method: "MozillaVPN_attemptPort"
-    }),
-
     // Set the theme
     Utils.applyTheme();
 
@@ -96,13 +120,9 @@ const Logic = {
       this.showAchievementOrContainersListPanel();
       break;
     case 7:
-      this.showPanel(P_ONBOARDING_8);
-      break;
     case 6:
-      this.showPanel(P_ONBOARDING_8);
-      break;
     case 5:
-      this.showPanel(P_ONBOARDING_6);
+      this.showAchievementOrContainersListPanel();
       break;
     case 4:
       this.showPanel(P_ONBOARDING_5);
@@ -645,8 +665,8 @@ Logic.registerPanel(P_ONBOARDING_5, {
   initialize() {
     // Let's move to the containers list panel.
     Utils.addEnterHandler(document.querySelector("#onboarding-longpress-button"), async () => {
-      await Logic.setOnboardingStage(5);
-      Logic.showPanel(P_ONBOARDING_6);
+      await Logic.setOnboardingStage(8);
+      Logic.showPanel(P_CONTAINERS_LIST);
     });
   },
 
@@ -656,96 +676,6 @@ Logic.registerPanel(P_ONBOARDING_5, {
   },
 });
 
-// P_ONBOARDING_6: Sixth page for Onboarding: new tab long-press behavior
-// ----------------------------------------------------------------------------
-
-Logic.registerPanel(P_ONBOARDING_6, {
-  panelSelector: ".onboarding-panel-6",
-
-  // This method is called when the object is registered.
-  initialize() {
-    // Let's move to the containers list panel.
-    Utils.addEnterHandler(document.querySelector("#start-sync-button"), async () => {
-      await Logic.setOnboardingStage(6);
-      await browser.storage.local.set({syncEnabled: true});
-      await browser.runtime.sendMessage({
-        method: "resetSync"
-      });
-      Logic.showPanel(P_ONBOARDING_7);
-    });
-    Utils.addEnterHandler(document.querySelector("#no-sync"), async () => {
-      await Logic.setOnboardingStage(6);
-      await browser.storage.local.set({syncEnabled: false});
-      await browser.runtime.sendMessage({
-        method: "resetSync"
-      });
-      Logic.showPanel(P_ONBOARDING_8);
-    });
-  },
-
-  // This method is called when the panel is shown.
-  prepare() {
-    return Promise.resolve(null);
-  },
-});
-// -----------------------------------------------------------------------
-
-Logic.registerPanel(P_ONBOARDING_7, {
-  panelSelector: ".onboarding-panel-7",
-
-  // This method is called when the object is registered.
-  initialize() {
-    // Let's move to the containers list panel.
-    Utils.addEnterHandler(document.querySelector("#sign-in"), async () => {
-      browser.tabs.create({
-        url: "https://accounts.firefox.com/?service=sync&action=email&context=fx_desktop_v3&entrypoint=multi-account-containers&utm_source=addon&utm_medium=panel&utm_campaign=container-sync&brand=mozilla",
-      });
-      await Logic.setOnboardingStage(7);
-      Logic.showPanel(P_ONBOARDING_8);
-    });
-    Utils.addEnterHandler(document.querySelector("#no-sign-in"), async () => {
-      await Logic.setOnboardingStage(7);
-      Logic.showPanel(P_ONBOARDING_8);
-    });
-  },
-
-  // This method is called when the panel is shown.
-  prepare() {
-    return Promise.resolve(null);
-  },
-});
-
-Logic.registerPanel(P_ONBOARDING_8, {
-  panelSelector: ".onboarding-panel-8",
-
-  // This method is called when the object is registered.
-  initialize() {
-    document.querySelectorAll(".onboarding-done").forEach(el => {
-      Utils.addEnterHandler(el, async () => {
-        await Logic.setOnboardingStage(8);
-        Logic.showPanel(P_CONTAINERS_LIST);
-      });
-    });
-
-  },
-
-  // This method is called when the panel is shown.
-  async prepare() {
-    const mozillaVpnPermissionsEnabled = await MozillaVPN.bothPermissionsEnabled();
-    if (!mozillaVpnPermissionsEnabled) {
-      const panel = document.querySelector(".onboarding-panel-8");
-      panel.classList.add("optional-permissions-disabled");
-
-      Utils.addEnterHandler(panel.querySelector("#onboarding-enable-permissions"), async () => {
-        const granted = await browser.permissions.request({ permissions: ["proxy", "nativeMessaging"] });
-        if (granted) {
-          await Logic.setOnboardingStage(8);
-        }
-      });
-    }
-    return Promise.resolve(null);
-  },
-});
 // P_CONTAINERS_LIST: The list of containers. The main page.
 // ----------------------------------------------------------------------------
 
@@ -754,7 +684,6 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
 
   // This method is called when the object is registered.
   async initialize() {
-    await browser.runtime.sendMessage({ method: "MozillaVPN_queryStatus" });
     Utils.addEnterHandler(document.querySelector("#manage-containers-link"), (e) => {
       if (!e.target.classList.contains("disable-edit-containers")) {
         Logic.showPanel(MANAGE_CONTAINERS_PICKER);
@@ -780,31 +709,8 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
       }
     });
 
-    const mozillaVpnPermissionsWarningDotName = "moz-permissions-warning-dot";
-
-    let { mozillaVpnHiddenToutsList } = await browser.storage.local.get("mozillaVpnHiddenToutsList");
-    if (typeof(mozillaVpnHiddenToutsList) === "undefined") {
-      await browser.storage.local.set({ "mozillaVpnHiddenToutsList": [] });
-      mozillaVpnHiddenToutsList = [];
-    }
-
-    // Badge Options icon if both nativeMessaging and/or proxy permissions are disabled
-    const bothMozillaVpnPermissionsEnabled = await MozillaVPN.bothPermissionsEnabled();
-    const warningDotShouldBeHidden = mozillaVpnHiddenToutsList.find(tout => tout.name === mozillaVpnPermissionsWarningDotName);
-    const optionsIcon = document.getElementById("info-icon");
-    if (optionsIcon && !bothMozillaVpnPermissionsEnabled && !warningDotShouldBeHidden) {
-      optionsIcon.classList.add("info-icon-alert");
-    }
-
     Utils.addEnterHandler((document.querySelector("#info-icon")), async() => {
       browser.runtime.openOptionsPage();
-      if (!mozillaVpnHiddenToutsList.find(tout => tout.name === mozillaVpnPermissionsWarningDotName)) {
-        optionsIcon.classList.remove("info-icon-alert");
-        mozillaVpnHiddenToutsList.push({
-          name: mozillaVpnPermissionsWarningDotName
-        });
-      }
-      await browser.storage.local.set({ mozillaVpnHiddenToutsList });
     });
   },
 
@@ -824,11 +730,8 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
       const td = document.createElement("td");
       const openTabs = identity.numberOfOpenTabs || "" ;
 
-      // TODO get UX and content decision on how to message and block clicks to containers with Mozilla VPN proxy configs
-      // when Mozilla VPN app is disconnected.
-
       td.innerHTML = Utils.escaped`
-        <div data-moz-proxy-warning="" class="menu-item-name">
+        <div class="menu-item-name">
           <div class="menu-icon">
 
             <div class="usercontext-icon"
@@ -839,7 +742,6 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
           <span class="menu-text">${identity.name}</span>
         </div>
         <span class="menu-right-float">
-          <img alt="" class="always-open-in-flag flag-img" src="/img/flags/.png"/>
           <span class="container-count">${openTabs}</span>
           <span class="menu-arrow">
             <img alt="Container Info" src="/img/arrow-icon-right.svg" />
@@ -856,9 +758,6 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
       const openInThisContainer = tr.querySelector(".menu-item-name");
       Utils.addEnterHandler(openInThisContainer, (e) => {
         e.preventDefault();
-        if (openInThisContainer.dataset.mozProxyWarning === "proxy-unavailable") {
-          return;
-        }
         try {
           browser.tabs.create({
             cookieStoreId: identity.cookieStoreId
@@ -896,8 +795,6 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
     document.addEventListener("keydown", Logic.keyboardNavListener);
     document.addEventListener("keydown", Logic.shortcutListener);
     document.addEventListener("input", Logic.filterContainerList);
-
-    MozillaVPN.handleContainerList(identities);
 
     // reset path
     this._previousPanelPath = [];
@@ -1201,7 +1098,6 @@ Logic.registerPanel(MANAGE_CONTAINERS_PICKER, {
           </div>
         </div>
         <span class="menu-text">${identity.name}</span>
-        <img alt="" class="flag-img manage-containers-list-flag" src="/img/flags/.png"/>
         <span class="move-button">
           <img
             class="pop-button-image"
@@ -1263,8 +1159,6 @@ Logic.registerPanel(MANAGE_CONTAINERS_PICKER, {
 
     list.innerHTML = "";
     list.appendChild(fragment);
-
-    MozillaVPN.handleContainerList(identities);
 
     return Promise.resolve();
   }
@@ -1440,6 +1334,18 @@ Logic.registerPanel(P_CONTAINER_ASSIGNMENTS, {
     const assignments = await Logic.getAssignmentObjectByContainer(userContextId);
     this.showAssignedContainers(assignments);
 
+    // Wire manual assignment handlers
+    const addBtn = document.getElementById("manual-assignment-add-btn");
+    const assignmentInput = document.getElementById("manual-assignment-input");
+
+    addBtn.addEventListener("click", () => this.handleManualAssignment());
+    assignmentInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        this.handleManualAssignment();
+      }
+    });
+
     return Promise.resolve(null);
   },
 
@@ -1504,6 +1410,32 @@ Logic.registerPanel(P_CONTAINER_ASSIGNMENTS, {
       });
     }
   },
+
+  async handleManualAssignment() {
+    const input = document.getElementById("manual-assignment-input");
+    const errorEl = document.getElementById("manual-assignment-error");
+    const value = input.value;
+    const result = extractHostname(value);
+
+    if (!result.valid) {
+      errorEl.textContent = "Please enter a valid website address";
+      errorEl.classList.remove("hide");
+      return;
+    }
+
+    errorEl.classList.add("hide");
+    const userContextId = Logic.currentUserContextId();
+
+    try {
+      await Utils.setOrRemoveAssignment(false, "https://" + result.hostname, userContextId, false);
+      input.value = "";
+      const assignments = await Logic.getAssignmentObjectByContainer(userContextId);
+      this.showAssignedContainers(assignments);
+    } catch (e) {
+      errorEl.textContent = "Failed to add site assignment";
+      errorEl.classList.remove("hide");
+    }
+  },
 });
 
 // P_CONTAINER_EDIT: Editor for a container.
@@ -1515,309 +1447,6 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
   // This method is called when the object is registered.
   async initialize() {
     this.initializeRadioButtons();
-
-    await browser.runtime.sendMessage({ method: "MozillaVPN_queryServers" });
-    await browser.runtime.sendMessage({ method: "MozillaVPN_queryStatus" });
-
-    class MozVpnContainerUi extends HTMLElement {
-      constructor() {
-        super();
-
-        this.subtitle = this.querySelector(".moz-vpn-subtitle");
-        this.collapsibleContent = this.querySelector(".collapsible-content");
-
-        this.visibilityTogglers = this.querySelectorAll(".hide-show-label");
-        this.hideShowButton = this.querySelector(".expand-collapse");
-        this.primaryCta = this.querySelector("#get-mozilla-vpn");
-        this.advancedProxySettingsButton = document.querySelector(".advanced-proxy-settings-btn");
-        this.toutName = "moz-tout-edit-container-panel";
-
-        // Switch
-        this.switch = this.querySelector("#moz-vpn-switch");
-        this.switchLabel = this.querySelector(".switch");
-
-        // Current server button
-        this.currentServerButton = this.querySelector("#moz-vpn-current-server");
-        this.currentCityName = this.querySelector(".current-city-name");
-        this.currentCountryFlag = this.querySelector(".current-country-flag");
-        this.currentCountryCode;
-
-        // Proxy inputs + viewer
-        this.advancedProxyAddress = document.getElementById("advanced-proxy-address");
-        this.proxyAddressInput = document.querySelector("#edit-container-panel-proxy");
-        this.cityNameInput = document.getElementById("city-name-input");
-        this.countryCodeInput = document.getElementById("country-code-input");
-        this.mozProxyEnabledInput = document.getElementById("moz-proxy-enabled");
-      }
-
-      async connectedCallback() {
-        const { mozillaVpnHiddenToutsList } = await browser.storage.local.get("mozillaVpnHiddenToutsList");
-        const mozillaVpnCollapseEditContainerTout = mozillaVpnHiddenToutsList && mozillaVpnHiddenToutsList.find(tout => tout.name === this.toutName);
-        const mozillaVpnInstalled = await browser.runtime.sendMessage({ method: "MozillaVPN_getInstallationStatus" });
-
-        this.hideShowButton.addEventListener("click", this);
-
-        if (mozillaVpnCollapseEditContainerTout && !mozillaVpnInstalled) {
-          this.collapseUi();
-        }
-
-        // Add listeners
-        if (!this.classList.contains("has-attached-listeners")) {
-
-          const bothMozillaVpnPermissionsEnabled = await MozillaVPN.bothPermissionsEnabled();
-          this.primaryCta.addEventListener("click", async() => {
-            if (!bothMozillaVpnPermissionsEnabled && mozillaVpnInstalled) {
-              await browser.permissions.request({ permissions: ["proxy", "nativeMessaging"] });
-            } else {
-              MozillaVPN.handleMozillaCtaClick("mac-edit-container-panel-btn");
-            }
-
-          });
-
-          this.switch.addEventListener("click", async() => {
-            const { mozillaVpnServers } = await browser.storage.local.get("mozillaVpnServers");
-            const id = Logic.currentIdentity();
-            this.enableDisableProxyButtons();
-
-            if (!this.switch.checked) {
-              const deactivatedMozProxy = MozillaVPN.getProxy(
-                this.countryCodeInput.value,
-                this.cityNameInput.value,
-                undefined,
-                mozillaVpnServers
-              );
-
-              if (!deactivatedMozProxy) {
-                return;
-              }
-
-              await proxifiedContainers.set(id.cookieStoreId, deactivatedMozProxy);
-              this.switch.checked = false;
-              return;
-            }
-            let proxy;
-
-            if (this.countryCodeInput.value.length === 2) {
-              // User is re-enabling a Mozilla proxy for this container.
-              // Use the stored location information to select a server
-              // in the same location.
-              proxy = MozillaVPN.getProxy(
-                this.countryCodeInput.value,
-                this.cityNameInput.value,
-                true,
-                mozillaVpnServers
-              );
-
-            } else {
-              // No saved Mozilla VPN proxy information. Get something new.
-              const { randomServerCountryCode, randomServerCityName } = await MozillaVPN.pickRandomLocation();
-
-              proxy = MozillaVPN.getProxy(
-                randomServerCountryCode,
-                randomServerCityName,
-                true,
-                mozillaVpnServers
-              );
-            }
-
-            if (proxy) {
-              await proxifiedContainers.set(id.cookieStoreId, proxy);
-              this.switch.checked = true;
-              this.updateProxyDependentUi(proxy);
-            } else {
-              this.switch.checked = false;
-              this.updateProxyDependentUi({});
-              return;
-            }
-          });
-        }
-
-        this.classList.add("has-attached-listeners");
-        this.currentServerButton.classList.add("hidden");
-      }
-
-      async updateMozVpnStatusDependentUi() {
-        const mozillaVpnInstalled = await browser.runtime.sendMessage({ method: "MozillaVPN_getInstallationStatus" });
-        const mozillaVpnConnected = await browser.runtime.sendMessage({ method: "MozillaVPN_getConnectionStatus" });
-
-        this.subtitle.textContent = browser.i18n.getMessage("integrateContainers");
-
-        const bothMozillaVpnPermissionsEnabled = await MozillaVPN.bothPermissionsEnabled();
-
-        if (mozillaVpnInstalled && !bothMozillaVpnPermissionsEnabled) {
-          this.subtitle.style.flex = "1 1 100%";
-          this.classList.remove("show-server-button");
-          this.subtitle.textContent = browser.i18n.getMessage("additionalPermissionNeeded");
-          this.hideEls(this.hideShowButton, this.switch, this.switchLabel, this.currentServerButton);
-          this.primaryCta.style.display = "block";
-          this.primaryCta.textContent = browser.i18n.getMessage("enable");
-          return;
-        }
-
-        if (mozillaVpnInstalled) {
-          // Hide cta and hide/show button
-          this.hideEls(this.primaryCta, this.hideShowButton);
-
-          // Update subtitle
-          this.subtitle.textContent = mozillaVpnConnected ? browser.i18n.getMessage("useCustomLocation") : browser.i18n.getMessage("mozillaVpnMustBeOn");
-          this.subtitle.style.flex = "1 1 80%";
-          this.currentServerButton.style.display = "flex";
-        }
-
-        if (mozillaVpnConnected) {
-          [this.switchLabel, this.switch].forEach(el => {
-            el.style.display = "inline-block";
-          });
-        } else {
-          this.hideEls(this.switch, this.switchLabel, this.currentServerButton);
-          this.switch.checked = false;
-        }
-
-        if ((mozillaVpnInstalled && !mozillaVpnConnected) || mozillaVpnConnected) {
-          this.expandUi();
-        }
-      }
-
-
-      async enableDisableProxyButtons() {
-        const mozillaVpnConnected = await browser.runtime.sendMessage({ method: "MozillaVPN_getConnectionStatus" });
-
-        if (!this.switch.checked || this.switch.disabled || !mozillaVpnConnected) {
-          this.currentServerButton.disabled = true;
-          this.advancedProxySettingsButton.disabled = false;
-          document.getElementById("moz-proxy-enabled").value = undefined;
-          return;
-        }
-
-        this.currentServerButton.disabled = false;
-        this.advancedProxySettingsButton.disabled = true;
-        this.advancedProxyAddress.textContent = "";
-      }
-
-      updateProxyInputs(proxyInfo) {
-        const resetProxyStorageEls = () => {
-          [this.proxyAddressInput, this.cityNameInput, this.countryCodeInput, this.mozProxyEnabledInput].forEach(el => {
-            el.value = "";
-
-          });
-          this.advancedProxyAddress.textContent = "";
-        };
-
-        resetProxyStorageEls();
-
-        if (typeof(proxyInfo) === "undefined" || typeof(proxyInfo.type) === "undefined") {
-          // no custom proxy is set
-          return;
-        }
-
-        this.cityNameInput.value = proxyInfo.cityName;
-        this.countryCodeInput.value = proxyInfo.countryCode;
-        this.mozProxyEnabledInput.value = proxyInfo.mozProxyEnabled;
-        this.proxyAddressInput.value = `${proxyInfo.type}://${proxyInfo.host}:${proxyInfo.port}`;
-
-        if (typeof(proxyInfo.countryCode) === "undefined" && proxyInfo.type) {
-          // Set custom proxy URL below 'Advanced proxy settings' button label
-          this.advancedProxyAddress.textContent = `${proxyInfo.type}://${proxyInfo.host}:${proxyInfo.port}`;
-        }
-      }
-
-      async updateProxyDependentUi(proxyInfo) {
-        const mozillaVpnProxyLocationAvailable = (proxy) => {
-          return typeof(proxy) !== "undefined" && typeof(proxy.countryCode) !== "undefined" && typeof(proxy.cityName) !== "undefined";
-        };
-
-        const mozillaVpnProxyIsEnabled = (proxy) => {
-          return typeof(proxy) !== "undefined" && typeof(proxy.mozProxyEnabled) !== "undefined" && proxy.mozProxyEnabled === true;
-        };
-
-        this.switch.checked = mozillaVpnProxyIsEnabled(proxyInfo);
-        this.updateProxyInputs(proxyInfo);
-        this.enableDisableProxyButtons();
-
-        const mozillaVpnConnected = await browser.runtime.sendMessage({ method: "MozillaVPN_getConnectionStatus" });
-        if (
-          !proxyInfo ||
-          !mozillaVpnProxyLocationAvailable(proxyInfo) ||
-          !mozillaVpnConnected
-        ) {
-          // Hide server location button
-          this.currentServerButton.classList.add("hidden");
-          this.classList.remove("show-server-button");
-        } else {
-          // Unhide server location button
-          this.currentServerButton.style.display = "flex";
-          this.currentServerButton.classList.remove("hidden");
-          this.classList.add("show-server-button");
-        }
-
-        // Populate inputs and server button with current or previously stored mozilla vpn proxy
-        if(proxyInfo && mozillaVpnProxyLocationAvailable(proxyInfo)) {
-          this.currentCountryFlag.style.backgroundImage = `url("./img/flags/${proxyInfo.countryCode.toUpperCase()}.png")`;
-          this.currentCountryFlag.style.backgroundImage = proxyInfo.countryCode + ".png";
-          this.currentCityName.textContent = proxyInfo.cityName;
-          this.countryCode = proxyInfo.countryCode;
-        }
-      }
-
-      expandUi() {
-        this.classList.add("expanded");
-      }
-
-      collapseUi() {
-        this.classList.remove("expanded");
-      }
-
-      hideEls(...els) {
-        els.forEach(el => {
-          el.style.display = "none";
-        });
-      }
-
-      async handleEvent(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.type === "keyup" && e.key !== " ") {
-          return;
-        }
-        this.classList.toggle("expanded");
-
-        const { mozillaVpnHiddenToutsList } = await browser.storage.local.get("mozillaVpnHiddenToutsList");
-        if (typeof(mozillaVpnHiddenToutsList) === "undefined") {
-          await browser.storage.local.set({ "mozillaVpnHiddenToutsList":[] });
-        }
-
-        const toutIndex = mozillaVpnHiddenToutsList.findIndex(tout => tout.name === mozillaVpnUi.toutName);
-        if (toutIndex === -1) {
-          mozillaVpnHiddenToutsList.push({ name: mozillaVpnUi.toutName });
-        } else {
-          this.expandUi();
-          mozillaVpnHiddenToutsList.splice(toutIndex, 1);
-        }
-        return await browser.storage.local.set({ mozillaVpnHiddenToutsList });
-      }
-
-    }
-
-    customElements.define("moz-vpn-container-ui", MozVpnContainerUi);
-    const mozillaVpnUi = document.querySelector("moz-vpn-container-ui");
-    mozillaVpnUi.updateMozVpnStatusDependentUi();
-
-    browser.permissions.onAdded.addListener(() => { mozillaVpnUi.updateMozVpnStatusDependentUi(); });
-    browser.permissions.onRemoved.addListener(() => { mozillaVpnUi.updateMozVpnStatusDependentUi(); });
-
-    const advancedProxySettingsButton = document.querySelector(".advanced-proxy-settings-btn");
-    Utils.addEnterHandler(advancedProxySettingsButton, () => {
-      Logic.showPanel(P_ADVANCED_PROXY_SETTINGS, this.getEditInProgressIdentity(), false, false);
-    });
-
-    const serverListButton = document.getElementById("moz-vpn-current-server");
-    Utils.addEnterHandler(serverListButton, () => {
-      const mozVpnEnabled = document.querySelector("#moz-vpn-switch").checked;
-      if (!mozVpnEnabled) {
-        return;
-      }
-      Logic.showPanel(P_MOZILLA_VPN_SERVER_LIST, this.getEditInProgressIdentity(), false);
-    });
 
     Utils.addEnterHandler(document.querySelector("#close-container-edit-panel"), () => {
       // Resets listener from siteIsolation checkbox to keep the update queue to 0.
@@ -1866,11 +1495,6 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     }
   },
 
-  openServerList() {
-    const updatedIdentity = this.getEditInProgressIdentity();
-    Logic.showPanel(P_MOZILLA_VPN_SERVER_LIST, updatedIdentity, false);
-  },
-
   // This prevents identity edits (change of icon, color, etc)
   // from getting lost when navigating to and from one
   // of the edit sub-pages (advanced proxy settings, for instance).
@@ -1916,9 +1540,6 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
 
   // This method is called when the panel is shown.
   async prepare() {
-    browser.runtime.sendMessage({ method: "MozillaVPN_queryServers" });
-    browser.runtime.sendMessage({ method: "MozillaVPN_queryStatus" });
-
     const identity = Logic.currentIdentity();
 
     // Populating the panel: name and icon
@@ -1928,8 +1549,6 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     document.querySelector("#edit-container-panel .panel-footer").hidden = !!userContextId;
     document.querySelector("#edit-container-panel .delete-container").hidden = !userContextId;
     document.querySelector("#edit-container-options").hidden = !userContextId;
-    document.querySelector("moz-vpn-container-ui").hidden = !userContextId;
-    document.querySelector("#advanced-proxy-settings-btn").hidden = !userContextId;
 
     Utils.addEnterHandler(document.querySelector("#manage-assigned-sites-list"), () => {
       Logic.showPanel(P_CONTAINER_ASSIGNMENTS, this.getEditInProgressIdentity(), false, false);
@@ -1957,321 +1576,11 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     Utils.addEnterHandler(deleteButton, () => {
       Logic.showPanel(P_CONTAINER_DELETE, this.getEditInProgressIdentity(), false, false);
     });
-    const mozillaVpnConnected = await browser.runtime.sendMessage({ method: "MozillaVPN_getConnectionStatus" });
-
-
-    const mozillaVpnUi = document.querySelector(".moz-vpn-controller-content");
-    mozillaVpnUi.updateMozVpnStatusDependentUi();
 
     if (!userContextId) {
       return;
     }
-
-    const proxyPermissionEnabled = await browser.permissions.contains({ permissions: ["proxy"] });
-    if (proxyPermissionEnabled) {
-      const proxyData = await proxifiedContainers.retrieve(identity.cookieStoreId);
-      if (proxyData && proxyData.proxy.mozProxyEnabled && !mozillaVpnConnected) {
-        mozillaVpnUi.updateProxyDependentUi({});
-        return;
-      }
-      const proxy = proxyData ? proxyData.proxy : {};
-      mozillaVpnUi.updateProxyDependentUi(proxy);
-    }
   },
-});
-
-Logic.registerPanel(P_ADVANCED_PROXY_SETTINGS, {
-  panelSelector: "#advanced-proxy-settings-panel",
-
-  async initialize() {
-    this._proxyForm = document.querySelector(".advanced-proxy-panel-content");
-    this._advancedProxyInput = this._proxyForm.querySelector("#edit-advanced-proxy-input");
-    const clearAdvancedProxyInput = this._proxyForm.querySelector("#clear-advanced-proxy-input");
-    this._submitadvancedProxy = this._proxyForm.querySelector("#submit-advanced-proxy");
-
-    this._advancedProxyInput.addEventListener("keydown", (e) => {
-      if (e.key !== "Enter") {
-        this.hideInvalidEntryWarning();
-      }
-    });
-
-    this._submitadvancedProxy.addEventListener("click", (e) => {
-      e.preventDefault();
-      this.submitProxyForm();
-    });
-
-    clearAdvancedProxyInput.addEventListener("click", (e) => {
-      e.preventDefault();
-
-      const activeEl = document.activeElement;
-      if (activeEl === this._advancedProxyInput) {
-        return this.submitProxyForm();
-      }
-      if (activeEl !== clearAdvancedProxyInput) {
-        return;
-      }
-      this.hideInvalidEntryWarning();
-      this._advancedProxyInput.value = "";
-      this._advancedProxyInput.focus();
-    });
-
-    this._advancedProxyInput.addEventListener("blur", () => {
-      if (this._advancedProxyInput.value.length === 0) {
-        return;
-      }
-      if(!proxifiedContainers.parseProxy(this._advancedProxyInput.value)) {
-        this.showInvalidEntryWarning();
-      }
-    });
-
-    this._advancedProxyInput.addEventListener("focus", () => {
-      this.hideInvalidEntryWarning();
-    });
-
-    const returnButton = document.getElementById("advanced-proxy-settings-return");
-    Utils.addEnterHandler(returnButton, () => {
-      return Logic.showPanel(P_CONTAINER_EDIT, Logic.currentIdentity(), false, false);
-    });
-
-    const learnMoreButton = document.getElementById("advanced-proxy-settings-learn-more");
-    Utils.addEnterHandler(learnMoreButton, () => {
-      browser.tabs.create({ url: "https://support.mozilla.org/kb/containers" });
-    });
-  },
-
-  showInvalidEntryWarning() {
-    this._proxyForm.classList.add("invalid");
-  },
-
-  hideInvalidEntryWarning() {
-    this._proxyForm.classList.remove("invalid");
-  },
-
-  async submitProxyForm() {
-    const parsedProxy = proxifiedContainers.parseProxy(this._advancedProxyInput.value);
-    if (this._advancedProxyInput.value.length > 0 && !parsedProxy) {
-      this.showInvalidEntryWarning();
-      return;
-    }
-    const identity = Logic.currentIdentity();
-    proxifiedContainers.set(identity.cookieStoreId, parsedProxy);
-
-    Logic.showPanel(P_CONTAINER_EDIT, Logic.currentIdentity(), false, false);
-  },
-
-  async prepare() {
-    const identity = Logic.currentIdentity();
-    const advancedProxyInput = document.getElementById("edit-advanced-proxy-input");
-
-    const proxyPermissionEnabled = await browser.permissions.contains({ permissions: ["proxy"] });
-    if (!proxyPermissionEnabled) {
-
-      // Restrict tabbing inside advanced proxy panel to proxy permissions ui
-      const panel = document.getElementById("advanced-proxy-settings-panel");
-      const clickableEls = panel.querySelectorAll("button, a, input");
-      clickableEls.forEach(el => {
-        if (!el.dataset.tabGroup && el.id !== "advanced-proxy-settings-return") {
-          el.setAttribute("tabindex", "-1");
-          el.disabled = true;
-        }
-      });
-
-      // Show proxy permission overlay
-      const permissionsOverlay = document.getElementById("permissions-overlay");
-      permissionsOverlay.style.display = "flex";
-
-      // Add "enable" button handling
-      const enableProxyPermissionsButton = document.getElementById("enable-proxy-permissions");
-
-      enableProxyPermissionsButton.addEventListener("click", async() => {
-        const granted = await browser.permissions.request({ permissions: ["proxy"] });
-        if (granted) {
-          permissionsOverlay.style.display = "none";
-          // restore normal panel tabbing
-          clickableEls.forEach(el => {
-            el.tabindex = "0";
-            el.disabled = false;
-          });
-        }
-      });
-    }
-
-
-    // reset input
-    const resetProxyInput = () => {
-      if (!advancedProxyInput) {
-        return;
-      }
-      advancedProxyInput.value = "";
-    };
-
-    resetProxyInput();
-
-    this.hideInvalidEntryWarning();
-
-    const setProxyInputPlaceholder = (proxy) => {
-      this._advancedProxyInput.value =  `${proxy.type}://${proxy.host}:${proxy.port}`;
-    };
-
-    const edit_proxy_dom = function(proxy) {
-      if (!proxy.type || MozillaVPN.proxyIsDisabled(proxy)) {
-        resetProxyInput();
-        return;
-      }
-      return setProxyInputPlaceholder(proxy);
-    };
-
-    const proxyData = await proxifiedContainers.retrieve(identity.cookieStoreId);
-    if (proxyData) {
-      edit_proxy_dom(proxyData.proxy);
-    } else {
-      resetProxyInput();
-    }
-    const containerColor = document.querySelector(".proxy-title-container-color");
-    containerColor.dataset.identityColor = identity.color;
-    return Promise.resolve(null);
-  }
-});
-
-Logic.registerPanel(P_MOZILLA_VPN_SERVER_LIST, {
-  panelSelector: "#moz-vpn-server-list-panel",
-  async initialize() {
-    await browser.runtime.sendMessage({ method: "MozillaVPN_queryStatus" });
-    await browser.runtime.sendMessage({ method: "MozillaVPN_queryServers" });
-
-    Utils.addEnterHandler(document.getElementById("moz-vpn-return"), async () => {
-      const identity = Logic.currentIdentity();
-      Logic.showPanel(P_CONTAINER_EDIT, identity, false, false);
-      Logic.showPreviousPanel();
-    });
-  },
-  async makeServerList(mozillaVpnServers = []) {
-    const listWrapper = document.getElementById("moz-vpn-server-list");
-
-    mozillaVpnServers.forEach((serverCountry) => {
-      const listItemTemplate = document.getElementById("server-list-item");
-      const templateClone = listItemTemplate.content.cloneNode(true);
-      const serverListItem = templateClone.querySelector(".server-list-item");
-      serverListItem.dataset.countryCode = serverCountry.code;
-
-      // Country name
-      const serverCountryName = templateClone.querySelector(".server-country-name");
-      serverCountryName.textContent = serverCountry.name;
-
-      // Flag
-      const serverCountryFlagImage = templateClone.querySelector(".server-country-flag");
-      serverCountryFlagImage.src = `../img/flags/${serverCountry.code.toUpperCase()}.png`;
-
-      const cityListVisibilityButton = templateClone.querySelector("button");
-
-      cityListVisibilityButton.addEventListener("click", (e) => {
-        const listItem = e.target.parentElement;
-        this.toggleCityListVisibility(listItem);
-      });
-
-      // Make server city list
-      const cityList = templateClone.querySelector("ul");
-      const cityListTemplate = document.getElementById("server-city-list-items");
-
-      serverCountry.cities.forEach(city => {
-        const cityTemplateClone = cityListTemplate.content.cloneNode(true);
-
-        const cityName = cityTemplateClone.querySelector(".server-city-name");
-
-        // Server city radio inputs
-        const radioBtn = cityTemplateClone.querySelector("input");
-        radioBtn.dataset.countryCode = serverCountry.code;
-        radioBtn.dataset.cityName = city.name;
-        radioBtn.name = "server-city";
-
-        const cityListItem = cityTemplateClone.querySelector(".server-city-list-item");
-        Utils.addEnterHandler((cityListItem), async(e) => {
-          if (e.key === "Enter") {
-            radioBtn.checked = true;
-          }
-          const identity = Logic.currentIdentity();
-          const proxy = MozillaVPN.getProxy(
-            radioBtn.dataset.countryCode,
-            radioBtn.dataset.cityName,
-            true,
-            mozillaVpnServers
-          );
-          await proxifiedContainers.set(identity.cookieStoreId, proxy);
-        });
-
-        // Set city name
-        cityName.textContent = city.name;
-        cityList.appendChild(cityTemplateClone);
-      });
-      listWrapper.appendChild(templateClone);
-    });
-  },
-
-
-  toggleCityListVisibility(listItem) {
-    const citiesList = listItem.querySelector("ul");
-    listItem.classList.toggle("expanded");
-    if (listItem.classList.contains("expanded")) {
-      // Expand city list
-      citiesList.style.height = citiesList.childElementCount * 48 + "px";
-    } else {
-      // Collapse city list
-      citiesList.style.height = 0;
-    }
-    return;
-  },
-
-  async checkActiveServer(activeProxy) {
-    document.querySelectorAll(".server-list-item").forEach(listItem => {
-      if (listItem.dataset.countryCode === activeProxy.countryCode) {
-        const currentCityRadioBtn = listItem.querySelector(`[data-city-name='${activeProxy.cityName}']`);
-        currentCityRadioBtn.checked = true;
-        if (!listItem.classList.contains("expanded")) {
-          this.toggleCityListVisibility(listItem);
-        }
-        setTimeout(() => {
-          currentCityRadioBtn.parentElement.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-        }, 100);
-        return;
-
-      } else {
-        // Collapse previously expanded list items
-        listItem.classList.remove("expanded");
-        listItem.querySelector("ul").style.height = "0";
-      }
-    });
-    return;
-  },
-  async prepare() {
-    const { mozillaVpnServers } = await browser.storage.local.get("mozillaVpnServers");
-    const identity = Logic.currentIdentity();
-
-    const listWrapper = document.getElementById("moz-vpn-server-list");
-    const chooseLocationTitle = document.getElementById("vpn-server-list-title");
-    const titleClassList = chooseLocationTitle.classList;
-
-    listWrapper.onscroll = () => {
-      const titleHasShadow = titleClassList.contains("drop-shadow");
-      if (listWrapper.scrollTop < 48 && titleHasShadow) {
-        titleClassList.remove("drop-shadow");
-      }
-      if (!titleHasShadow && listWrapper.scrollTop > 48 ) {
-        titleClassList.add("drop-shadow");
-      }
-    };
-
-    if (document.querySelectorAll(".server-list-item").length < 2) {
-      this.makeServerList(mozillaVpnServers);
-    }
-
-    const proxyData = await proxifiedContainers.retrieve(identity.cookieStoreId);
-    if (proxyData) {
-      this.checkActiveServer(proxyData.proxy);
-    }
-  }
 });
 
 // P_CLEAR_CONTAINER_STORAGE: Page for confirming container storage removal.

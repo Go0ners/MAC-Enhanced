@@ -15,7 +15,6 @@ async function init() {
           </div>
         </div>
         <span class="menu-text">${identity.name}</span>
-        <img alt="" class="page-action-flag flag-img" src="/img/flags/.png"/>
         `;
 
     tr.appendChild(td);
@@ -30,8 +29,6 @@ async function init() {
   const list = document.querySelector("#picker-identities-list");
   list.innerHTML = "";
   list.appendChild(fragment);
-
-  MozillaVPN.handleContainerList(identities);
 
   // Set the theme
   Utils.applyTheme();
